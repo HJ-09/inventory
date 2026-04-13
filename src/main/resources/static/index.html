@@ -55,11 +55,7 @@
 </div>
 
 
-<div id="pagination">
-    <button onclick="prevPage()">이전</button>
-    <span id="page-info"></span>
-    <button onclick="nextPage()">다음</button>
-</div>
+<div id="pagination"></div>
 
 
 
@@ -274,33 +270,39 @@
         });
     }
 
-    //페이지
-    function nextPage() {
-        currentPage++;
-        loadProducts();
-    }
-
-    function prevPage() {
-        if (currentPage > 0) {
-            currentPage--;
-            loadProducts();
-        }
-    }
 
     //페이지버튼
     function renderPagination(totalPages, pageNumber) {
         const pagination = document.getElementById("pagination");
         pagination.innerHTML = "";
 
-        for (let i = 0; i < totalPages; i++) {
-            const btn = document.createElement("button");
+        const groupSize = 5;
+        const group = Math.floor(pageNumber / groupSize);
 
+        const start = group * groupSize;
+        const end = Math.min(start + groupSize, totalPages);
+
+        // 이전 버튼
+        if (start > 0) {
+            const prevBtn = document.createElement("button");
+            prevBtn.innerText = "이전";
+
+            prevBtn.onclick = () => {
+                currentPage = start - 1;
+                loadProducts();
+            };
+
+            pagination.appendChild(prevBtn);
+        }
+
+
+        // 페이지 번호
+        for (let i = start; i < end; i++) {
+            const btn = document.createElement("button");
             btn.innerText = i + 1;
 
-            // 현재 페이지 강조
             if (i === pageNumber) {
-                btn.style.fontWeight = "bold";
-                btn.style.backgroundColor = "#ddd";
+                btn.classList.add("active")
             }
 
             btn.onclick = () => {
@@ -310,6 +312,41 @@
 
             pagination.appendChild(btn);
         }
+
+
+        // 다음 버튼
+        if (end < totalPages) {
+            const nextBtn = document.createElement("button");
+            nextBtn.innerText = "다음";
+
+            nextBtn.onclick = () => {
+                currentPage = end;
+                loadProducts();
+            };
+
+            pagination.appendChild(nextBtn);
+        }
+
+        /*for (let i = 0; i < totalPages; i++) {
+            const btn = document.createElement("button");
+
+            btn.innerText = i + 1;
+
+            // 현재 페이지
+            if (i === pageNumber) {
+                btn.style.fontWeight = "bold";
+                btn.style.backgroundColor = "#ddd";
+            }
+
+
+
+            btn.onclick = () => {
+                currentPage = i;
+                loadProducts();
+            };
+
+            pagination.appendChild(btn);
+        }*/
     }
 
 

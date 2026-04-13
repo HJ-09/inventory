@@ -171,3 +171,32 @@ td:last-child {
 }
 
 
+/* 페이지 버튼 */
+#pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+#pagination button.active {
+    background-color: navy;
+    color: white;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.1s ease;
+}
+
+#pagination button:hover {
+    background-color: #62626c;
+    color: white;
+}
