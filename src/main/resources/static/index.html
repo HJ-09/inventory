@@ -53,8 +53,21 @@
         <tbody id="list"></tbody>
     </table>
 </div>
+
+
+<div id="pagination">
+    <button onclick="prevPage()">이전</button>
+    <span id="page-info"></span>
+    <button onclick="nextPage()">다음</button>
+</div>
+
+
+
 <script>
     let selectedId = null;
+    let currentPage = 0;
+    const pageSize = 10;
+
 
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         event.preventDefault();
@@ -63,14 +76,16 @@
 
     // 목록출력
     function loadProducts() {
-        fetch("/products")
+        //document.getElementById("page-info").innerText = currentPage + 1 + " 페이지";
+
+        fetch(`/products?page=${currentPage}&size=${pageSize}`)
             .then(res => res.json())
             .then(data => {
 
                 const list = document.getElementById("list");
                 list.innerHTML = "";
 
-                data.forEach(p => {
+                data.content.forEach(p => {
                     const tr = document.createElement("tr");
 
                     tr.innerHTML = `
@@ -84,22 +99,14 @@
                         </td>
                     `;
 
-
                     list.appendChild(tr);
                 });
+
+                renderPagination(data.totalPages, data.number);
+
             });
     }
 
-
-    // 수정시 입력칸 채우기
-    function fillForm(p) {
-        document.getElementById("name").value = p.name;
-        document.getElementById("quantity").value = p.quantity;
-        document.getElementById("price").value = p.price;
-        document.getElementById("purchase").value = p.purchase;
-
-        selectedId = p.id;
-    }
 
 
     // 재고추가 및 수정
@@ -221,7 +228,7 @@
     }
 
 
-    //수정
+    //상품수정
     function editRow(btn, id) {
         const tr = btn.closest("tr");
 
@@ -265,6 +272,44 @@
         }).then(() => {
             loadProducts();
         });
+    }
+
+    //페이지
+    function nextPage() {
+        currentPage++;
+        loadProducts();
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            loadProducts();
+        }
+    }
+
+    //페이지버튼
+    function renderPagination(totalPages, pageNumber) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        for (let i = 0; i < totalPages; i++) {
+            const btn = document.createElement("button");
+
+            btn.innerText = i + 1;
+
+            // 현재 페이지 강조
+            if (i === pageNumber) {
+                btn.style.fontWeight = "bold";
+                btn.style.backgroundColor = "#ddd";
+            }
+
+            btn.onclick = () => {
+                currentPage = i;
+                loadProducts();
+            };
+
+            pagination.appendChild(btn);
+        }
     }
 
 
