@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory status</title>
+
+
+<!--    <link  layout:fragment="css" th:href="@{/css/main.css}" rel="stylesheet"/>-->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>재고현황</h1>
+
+    <div class="top-bar">
+
+
+        <!--입력-->
+        <div class="input-group">
+            <input id="name" placeholder="상품명">
+            <input id="quantity" placeholder="수량">
+            <input id="price" placeholder="가격">
+            <input id="purchase" type="date">
+            <button class="add-btn" onclick="addProduct()">상품 추가</button>
+        </div>
+
+
+        <!--검색-->
+        <div class="search-group">
+            <form id="searchForm">
+                <input id="search" name="search" placeholder="검색어를 입력하세요.">
+                <button class="search-btn" type="submit">검색</button>
+            </form>
+        </div>
+
+    </div>
+
+<hr>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>상품명</th>
+        <th>수량</th>
+        <th>가격</th>
+        <th>구매날짜</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody id="list"></tbody>
+</table>
+</div>
+<script>
+    let selectedId = null;
+
+    document.getElementById("searchForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        search();
+    });
+
+    // 목록출력
+    function loadProducts() {
+        fetch("/products")
+            .then(res => res.json())
+            .then(data => {
+
+                const list = document.getElementById("list");
+                list.innerHTML = "";
+
+                data.forEach(p => {
+                    const tr = document.createElement("tr");
+
+                    tr.innerHTML = `
+                        <td>${p.name}</td>
+                        <td>${p.quantity}</td>
+                        <td>${formatPrice(p.price)}</td>
+                        <td>${formatDate(p.purchase)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="fillForm(${JSON.stringify(p).replace(/"/g, '&quot;')})">수정</button>
+                            <button class="delete-btn" onclick="deleteProduct(${p.id})">삭제</button>
+                        </td>
+                    `;
+
+
+                    list.appendChild(tr);
+                });
+            });
+    }
+
+
+    // 수정시 입력칸 채우기
+    function fillForm(p) {
+        document.getElementById("name").value = p.name;
+        document.getElementById("quantity").value = p.quantity;
+        document.getElementById("price").value = p.price;
+        document.getElementById("purchase").value = p.purchase;
+
+        selectedId = p.id;
+    }
+
+
+    // 재고추가 및 수정
+    function addProduct() {
+
+        const data = {
+            name: document.getElementById("name").value,
+            quantity: document.getElementById("quantity").value,
+            price: document.getElementById("price").value,
+            purchase: document.getElementById("purchase").value
+        };
+
+        if (selectedId) {
+            // 수정
+            fetch("/products/" + selectedId, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(() => {
+                selectedId = null;
+                clearInput();
+                loadProducts();
+            });
+        } else {
+            // 추가
+            fetch("/products", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(() => {
+                clearInput();
+                loadProducts();
+            });
+        }
+    }
+
+
+    // 재고삭제
+    function deleteProduct(id) {
+        fetch("/products/" + id, {
+            method: "DELETE"
+        }).then(() => loadProducts());
+    }
+
+
+    // 입력 초기화
+    function clearInput() {
+        document.getElementById("name").value = "";
+        document.getElementById("quantity").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("purchase").value = "";
+    }
+
+    // 처음 실행 시 목록 불러오기
+    loadProducts();
+
+
+    //상품검색
+    function search() {
+        event.preventDefault();
+
+
+        const keyword = document.getElementById("search").value;
+
+        //검색결과 없으면 전체목록으로
+        if (keyword === "") {
+            loadProducts();
+            return;
+        }
+
+        fetch("/products/search?name=" + keyword)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    alert("검색 결과가 없습니다.");
+                    return;
+                }
+
+                renderList(data);
+            });
+    }
+
+    function renderList(data) {
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+
+        data.forEach(p => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.quantity}</td>
+            <td>${p.price}</td>
+            <td>${p.purchase}</td>
+            <td>
+                <button onclick="deleteProduct(${p.id})">삭제</button>
+                <button onclick="fillForm(${JSON.stringify(p).replace(/"/g, '&quot;')})">수정</button>
+            </td>
+        `;
+
+            list.appendChild(tr);
+        });
+    }
+
+    //가격
+    function formatPrice(price) {
+        if (!price) return 0;
+        return "₩" + Number(price).toLocaleString();
+    }
+
+
+    //날짜형식 변경
+    function formatDate(date) {
+        if (!date) return "";
+        return date.replaceAll("-", ".");
+    }
+
+
+</script>
+
+
+</body>
+</html>
+
