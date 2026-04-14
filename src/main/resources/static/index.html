@@ -36,9 +36,33 @@
             </form>
         </div>
 
+        <!--정렬드롭다운-->
+        <!--<div class="dropdown">
+            <select id="sort">
+                <option value="id,desc">최신순</option>
+                <option value="price,asc">가격 낮은순</option>
+                <option value="price,desc">가격 높은순</option>
+                <option value="purchase,desc">최근 구매순</option>
+                <option value="purchase,asc">오래된 구매순</option>
+            </select>
+        </div>-->
+
     </div>
 
     <hr>
+    <div class="sort-bar">
+        <div class="dropdown">
+            <div class="selected">최신순</div>
+            <ul class="options">
+                <li data-value="id,desc" class="active">최신순 ✔</li>
+                <li data-value="price,asc">가격 낮은순</li>
+                <li data-value="price,desc">가격 높은순</li>
+                <li data-value="purchase,desc">최근 구매순</li>
+                <li data-value="purchase,asc">오래된 구매순</li>
+            </ul>
+        </div>
+    </div>
+
 
     <table border="1">
         <thead>
@@ -58,11 +82,15 @@
 <div id="pagination"></div>
 
 
-
 <script>
     let selectedId = null;
     let currentPage = 0;
     const pageSize = 10;
+    let currentSort = "id, desc";
+
+    const dropdown = document.querySelector(".dropdown");
+    const selected = document.querySelector(".selected");
+    const options = document.querySelectorAll(".options li");
 
 
     document.getElementById("searchForm").addEventListener("submit", function (event) {
@@ -74,7 +102,7 @@
     function loadProducts() {
         //document.getElementById("page-info").innerText = currentPage + 1 + " 페이지";
 
-        fetch(`/products?page=${currentPage}&size=${pageSize}`)
+        fetch(`/products?page=${currentPage}&size=${pageSize}&sort=${currentSort}`)
             .then(res => res.json())
             .then(data => {
 
@@ -102,7 +130,6 @@
 
             });
     }
-
 
 
     // 재고추가 및 수정
@@ -164,7 +191,7 @@
     loadProducts();
 
 
-    //상품검색
+    // 상품검색
     function search() {
         event.preventDefault();
 
@@ -210,21 +237,21 @@
         });
     }
 
-    //가격
+    // 가격
     function formatPrice(price) {
         if (!price) return 0;
         return "₩" + Number(price).toLocaleString();
     }
 
 
-    //날짜형식 변경
+    // 날짜형식 변경
     function formatDate(date) {
         if (!date) return "";
         return date.replaceAll("-", ".");
     }
 
 
-    //상품수정
+    // 상품수정
     function editRow(btn, id) {
         const tr = btn.closest("tr");
 
@@ -247,7 +274,7 @@
     `;
     }
 
-    //수정하고 저장
+    // 수정하고 저장
     function saveRow(btn, id) {
         const tr = btn.closest("tr");
         const inputs = tr.querySelectorAll("input");
@@ -271,7 +298,7 @@
     }
 
 
-    //페이지버튼
+    // 페이지버튼
     function renderPagination(totalPages, pageNumber) {
         const pagination = document.getElementById("pagination");
         pagination.innerHTML = "";
@@ -350,6 +377,46 @@
     }
 
 
+    // 정렬
+    selected.addEventListener("click", () => {
+        dropdown.classList.toggle("open");
+    });
+
+    // 옵션 클릭
+    options.forEach(option => {
+        option.addEventListener("click", () => {
+            const value = option.getAttribute("data-value");
+            const text = option.innerText.replace(" ✔", "");
+
+            // 텍스트 변경
+            selected.innerText = text;
+
+            // 기존 선택 제거
+            options.forEach(o => {
+                o.classList.remove("active");
+                o.innerText = o.innerText.replace(" ✔", "");
+            });
+
+            // 선택 표시
+            option.classList.add("active");
+            option.innerText = text + " ✔";
+
+            // 정렬값 적용
+            currentSort = value;
+            currentPage = 0;
+            loadProducts();
+
+            // 닫기
+            dropdown.classList.remove("open");
+        });
+    });
+
+    // 바깥 클릭 시 닫기
+    document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target)) {
+            dropdown.classList.remove("open");
+        }
+    });
 </script>
 
 

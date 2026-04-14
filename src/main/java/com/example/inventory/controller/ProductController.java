@@ -24,9 +24,10 @@ public class ProductController {
     @GetMapping("/products") //조회 API, 페이지
     public Page<Product> getProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id, desc") String sort
     ) {
-        return productService.findPage(page, size);
+        return productService.findPage(page, size, sort);
     }
 
     //상품삭제

@@ -44,6 +44,10 @@ body {
     margin-left: auto;
     flex: 1;
     max-width: 200px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 
@@ -199,4 +203,105 @@ td:last-child {
 #pagination button:hover {
     background-color: #62626c;
     color: white;
+}
+
+#sort {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#sort:hover {
+    border-color: black;
+}
+
+.sort-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 0 15px;
+}
+
+.dropdown {
+    position: relative;
+    width: 96px;
+    font-size: 12px;
+}
+
+.dropdown.open .selected::after {
+    transform: rotate(180deg);
+}
+
+.dropdown.open .options {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.selected {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    transition: all 0.2s;
+}
+
+.selected:hover {
+    border-color: #4CAF50;
+}
+
+.selected::after {
+    content: "▼";
+    font-size: 11px;
+    color: gray;
+    transition: transform 0.2s;
+}
+
+.options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    margin-top: 5px;
+    padding: 5px 0;
+    list-style: none;
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.options li {
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.options li:hover {
+    background-color: #f5f7fa;
+}
+
+.options li.active {
+    color: #4CAF50;
+    font-weight: bold;
 }

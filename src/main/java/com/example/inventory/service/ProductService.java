@@ -5,6 +5,7 @@ import com.example.inventory.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -56,8 +57,18 @@ public class ProductService {
 
 
     //페이지
-    public Page<Product> findPage(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Product> findPage(int page, int size, String sort) {
+
+        String[] sortArr = sort.split(",");
+
+        String field = sortArr[0];
+        String direction = sortArr[1];
+
+        Sort.Direction dir = direction.equalsIgnoreCase("asc") ?
+                Sort.Direction.ASC : Sort.Direction.DESC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, field));
+
         return productRepository.findAll(pageable);
     }
 
