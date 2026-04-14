@@ -77,7 +77,8 @@
     let selectedId = null;
     let currentPage = 0;
     const pageSize = 10;
-    let currentSort = "id, desc";
+    let currentSort = "id,desc";
+    let currentKeyword = "";
 
     const dropdown = document.querySelector(".dropdown");
     const selected = document.querySelector(".selected");
@@ -91,9 +92,13 @@
 
     // 목록출력
     function loadProducts() {
-        //document.getElementById("page-info").innerText = currentPage + 1 + " 페이지";
+        let url = `/products?page=${currentPage}&size=${pageSize}&sort=${currentSort}`;
 
-        fetch(`/products?page=${currentPage}&size=${pageSize}&sort=${currentSort}`)
+        if (currentKeyword !== "") {
+            url += `&keyword=${currentKeyword}`;
+        }
+
+        fetch(url)
             .then(res => res.json())
             .then(data => {
 
@@ -186,24 +191,12 @@
     function search() {
         event.preventDefault();
 
-        const keyword = document.getElementById("search").value;
+        const keyword = document.getElementById("search").value.trim();
 
-        //검색결과 없으면 전체목록으로
-        if (keyword === "") {
-            loadProducts();
-            return;
-        }
+        currentKeyword = keyword;
+        currentPage = 0;
 
-        fetch("/products/search?name=" + keyword)
-            .then(res => res.json())
-            .then(data => {
-                if (data.length === 0) {
-                    alert("검색 결과가 없습니다.");
-                    return;
-                }
-
-                renderList(data);
-            });
+        loadProducts();
     }
 
     function renderList(data) {
@@ -408,6 +401,8 @@
             dropdown.classList.remove("open");
         }
     });
+
+
 </script>
 
 

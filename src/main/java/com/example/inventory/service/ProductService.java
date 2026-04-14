@@ -50,26 +50,23 @@ public class ProductService {
     }
 
 
-    //상품검색
-    public List<Product> search(String name) {
-        return productRepository.findByNameContaining(name);
-    }
-
-
     //페이지
-    public Page<Product> findPage(int page, int size, String sort) {
+    public Page<Product> findPage(int page, int size, String keyword, String sort) {
 
-        String[] sortArr = sort.split(",");
+        Pageable pageable;
 
-        String field = sortArr[0];
-        String direction = sortArr[1];
+        if (sort != null) {
+            String[] s = sort.split(",");
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(s[1]), s[0]));
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
 
-        Sort.Direction dir = direction.equalsIgnoreCase("asc") ?
-                Sort.Direction.ASC : Sort.Direction.DESC;
+        if (keyword == null || keyword.isEmpty()) {
+            return productRepository.findAll(pageable);
+        }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, field));
-
-        return productRepository.findAll(pageable);
+        return productRepository.findByNameContaining(keyword, pageable);
     }
 
 }

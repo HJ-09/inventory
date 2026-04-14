@@ -3,6 +3,7 @@ package com.example.inventory.controller;
 import com.example.inventory.entity.Product;
 import com.example.inventory.service.ProductService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +26,10 @@ public class ProductController {
     public Page<Product> getProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id, desc") String sort
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort
     ) {
-        return productService.findPage(page, size, sort);
+        return productService.findPage(page, size, keyword, sort);
     }
 
     //상품삭제
@@ -43,11 +45,6 @@ public class ProductController {
     }
 
 
-    //상품검색
-    @GetMapping("/products/search")
-    public List<Product> search(@RequestParam String name) {
-        return productService.search(name);
-    }
 
 
 }
