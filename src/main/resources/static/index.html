@@ -13,7 +13,7 @@
 
 <div class="container">
 
-    <h1>재고현황</h1>
+    <h1 onclick="home()" style="cursor: pointer;">재고현황</h1>
 
     <div class="top-bar">
 
@@ -79,6 +79,7 @@
     const pageSize = 10;
     let currentSort = "id,desc";
     let currentKeyword = "";
+    let isPopState = false;
 
     const dropdown = document.querySelector(".dropdown");
     const selected = document.querySelector(".selected");
@@ -101,6 +102,11 @@
         fetch(url)
             .then(res => res.json())
             .then(data => {
+
+                if (currentKeyword && data.content.length === 0 ) {
+                    alert("검색 결과가 없습니다.");
+                    return;
+                }
 
                 const list = document.getElementById("list");
                 list.innerHTML = "";
@@ -184,7 +190,7 @@
     }
 
     // 처음 실행 시 목록 불러오기
-    loadProducts();
+    initFromURL();
 
 
     // 상품검색
@@ -193,10 +199,13 @@
 
         const keyword = document.getElementById("search").value.trim();
 
-        currentKeyword = keyword;
-        currentPage = 0;
 
-        loadProducts();
+                currentKeyword = keyword;
+                currentPage = 0;
+
+                updateURL();
+                loadProducts();
+
     }
 
     function renderList(data) {
@@ -300,6 +309,7 @@
 
             prevBtn.onclick = () => {
                 currentPage = start - 1;
+                updateURL();
                 loadProducts();
             };
 
@@ -388,6 +398,8 @@
             // 정렬값 적용
             currentSort = value;
             currentPage = 0;
+
+            updateURL();
             loadProducts();
 
             // 닫기
@@ -402,6 +414,76 @@
         }
     });
 
+
+    // 뒤로가기 유지
+    function updateURL() {
+        if (isPopState) return;
+
+        const params = new URLSearchParams();
+
+        params.set("page", currentPage);
+        params.set("size", pageSize);
+
+        if (currentKeyword) {
+            params.set("keyword", currentKeyword);
+        }
+
+        if (currentSort) {
+            params.set("sort", currentSort);
+        }
+
+        const newUrl = "/?" + params.toString();
+        window.history.pushState({}, "", newUrl);
+    }
+
+
+    // 상태복원
+    function initFromURL() {
+        const params = new URLSearchParams(window.location.search);
+
+        currentPage = parseInt(params.get("page")) || 0;
+        currentKeyword = params.get("keyword") || "";
+        currentSort = params.get("sort") || "id,desc";
+
+        // 검색창에도 반영
+        document.getElementById("search").value = currentKeyword;
+
+        options.forEach(option => {
+            if (option.getAttribute("data-value") === currentSort) {
+                const text = option.innerText.replace(" ✔", "");
+
+                selected.innerText = text;
+
+                option.classList.add("active");
+                option.innerText = text + " ✔";
+            } else {
+                option.classList.remove("active");
+                option.innerText = option.innerText.replace(" ✔", "");
+            }
+        });
+
+
+        loadProducts();
+    }
+
+    window.onpopstate = function () {
+        isPopState = true;
+        initFromURL();
+        isPopState = false;
+    };
+
+
+    // 홈버튼
+    function home() {
+        currentPage = 0;
+        currentKeyword = "";
+        currentSort = "id,desc";
+
+        document.getElementById("search").value="";
+
+        updateURL();
+        loadProducts();
+    }
 
 </script>
 
