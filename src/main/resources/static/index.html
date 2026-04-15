@@ -31,7 +31,10 @@
         <!--검색-->
         <div class="search-group">
             <form id="searchForm">
-                <input id="search" name="search" placeholder="검색어를 입력하세요.">
+                <div class="search-box">
+                    <input id="search" name="search" placeholder="검색어를 입력하세요.">
+                    <span id="clearBtn">x</span>
+                </div>
                 <button class="search-btn" type="submit">검색</button>
             </form>
         </div>
@@ -84,6 +87,8 @@
     const dropdown = document.querySelector(".dropdown");
     const selected = document.querySelector(".selected");
     const options = document.querySelectorAll(".options li");
+
+    const clearBtn = document.getElementById("clearBtn");
 
 
     document.getElementById("searchForm").addEventListener("submit", function (event) {
@@ -522,6 +527,42 @@
             loadProducts();
         }
     });
+
+
+    window.onload = function () {
+
+        const searchInput = document.getElementById("search");
+        const clearBtn = document.getElementById("clearBtn");
+
+
+        // 검색창 x표시
+        searchInput.addEventListener("input", function () {
+            if (this.value.trim() !== "") {
+                clearBtn.style.display = "block";
+            } else {
+                clearBtn.style.display = "none";
+            }
+        });
+
+        clearBtn.addEventListener("click", function () {
+            searchInput.value = "";
+            clearBtn.style.display = "none";
+
+            searchInput.focus();
+        });
+
+        searchInput.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+                currentKeyword = "";
+                currentPage = 0;
+
+                updateURL();
+                loadProducts();
+            }
+        });
+
+    }
+
 
 </script>
 

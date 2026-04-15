@@ -86,8 +86,37 @@ button {
 
 /*검색창*/
 #search {
-    flex: 1;
     width: 100%;
+    min-width: 0;
+}
+
+#searchForm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#clearBtn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    display: none;
+    margin-left: 5px;
+    color: #888;
+}
+
+#clearBtn:hover {
+    color: #000;
 }
 
 /* 버튼 색상 */
@@ -101,8 +130,9 @@ button:active {
 
 /* 기능별 버튼 */
 .add-btn {
-    background-color: #4CAF50;
-    color: white;
+    border: 1px solid #787878;
+    color: #787878;
+    background-color: white;
 }
 
 .search-btn {
