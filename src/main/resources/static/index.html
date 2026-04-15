@@ -498,7 +498,18 @@
         currentKeyword = "";
         currentSort = "id,desc";
 
-        document.getElementById("search").value="";
+        document.getElementById("search").value = "";
+
+        options.forEach(option => {
+            option.classList.remove("active");;
+            option.innerText = option.innerText.replace(" ✔", "");
+
+            if (option.getAttribute("data-value") === "id,desc") {
+                option.classList.add("active");
+                option.innerText = "최신순 ✔"
+                selected.innerText = "최신순";
+            }
+        })
 
         updateURL();
         loadProducts();
