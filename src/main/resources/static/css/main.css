@@ -174,7 +174,8 @@ table {
 /* 헤더 */
 th {
     background-color: #f1f3f5;
-    padding: 12px;
+    padding: 15px;
+    border-bottom: 1px solid black;
 }
 
 /* 셀 */
@@ -182,8 +183,8 @@ td {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 10px;
-    border-top: 1px solid #ddd;
+    padding: 8px;
+    border-top: 1px solid #a3a3a3;
 }
 
 td:nth-child(1) {
@@ -261,8 +262,8 @@ td:last-child {
 
 .dropdown {
     position: relative;
-    width: 96px;
-    font-size: 12px;
+    width: 98px;
+    font-size: 11px;
 }
 
 .dropdown.open .selected::after {
