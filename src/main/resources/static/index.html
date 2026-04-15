@@ -83,6 +83,7 @@
     let currentSort = "id,desc";
     let currentKeyword = "";
     let isPopState = false;
+    let spinner = false;
 
     const dropdown = document.querySelector(".dropdown");
     const selected = document.querySelector(".selected");
@@ -98,6 +99,18 @@
 
     // 목록출력
     function loadProducts() {
+
+        const list = document.getElementById("list");
+        if (spinner) {
+            list.innerHTML = `
+            <tr>
+                <td colspan="5" class="spinner-row">
+                    <div class="spinner"></div>
+                </td>
+            </tr>
+            `;
+        }
+
         let url = `/products?page=${currentPage}&size=${pageSize}&sort=${currentSort}`;
 
         if (currentKeyword !== "") {
@@ -107,6 +120,7 @@
         fetch(url)
             .then(res => res.json())
             .then(data => {
+                spinner = false;
 
                 if (data.content.length === 0 ) {
                     if (currentKeyword.trim() !== "" ) {
@@ -121,7 +135,6 @@
                 }
 
 
-                const list = document.getElementById("list");
                 list.innerHTML = "";
 
                 data.content.forEach(p => {
@@ -494,6 +507,8 @@
 
     // 홈버튼
     function home() {
+        spinner = true;
+
         currentPage = 0;
         currentKeyword = "";
         currentSort = "id,desc";
