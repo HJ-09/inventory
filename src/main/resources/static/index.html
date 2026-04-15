@@ -103,10 +103,18 @@
             .then(res => res.json())
             .then(data => {
 
-                if (currentKeyword && data.content.length === 0 ) {
-                    alert("검색 결과가 없습니다.");
+                if (data.content.length === 0 ) {
+                    if (currentKeyword.trim() !== "" ) {
+                        renderEmpty("검색 결과가 없습니다.");
+                    } else {
+                        renderEmpty("등록된 상품이 없습니다.");
+                    }
+
+                    document.getElementById("pagination").innerHTML = "";
+
                     return;
                 }
+
 
                 const list = document.getElementById("list");
                 list.innerHTML = "";
@@ -199,13 +207,19 @@
 
         const keyword = document.getElementById("search").value.trim();
 
+            if (keyword === "") {
+                currentKeyword = "";
+                currentPage = 0;
 
+                updateURL();
+                loadProducts();
+                return;
+            }
                 currentKeyword = keyword;
                 currentPage = 0;
 
                 updateURL();
                 loadProducts();
-
     }
 
     function renderList(data) {
@@ -484,6 +498,30 @@
         updateURL();
         loadProducts();
     }
+
+    // 결과 없을 때
+    function renderEmpty(message) {
+        const list = document.getElementById("list");
+        list.innerHTML = `<tr><td colspan="5">${message}</td></tr>`;
+
+        document.getElementById("pagination").innerHTML = "";
+    }
+
+
+    // 검색칸이 비었을 때 목록 원상복구(클릭)
+    const searchInput = document.getElementById("search");
+
+    searchInput.addEventListener("blur", function () {
+        const keyword = this.value.trim();
+
+        if (keyword === "") {
+            currentKeyword = "";
+            currentPage = 0;
+
+            updateURL();
+            loadProducts();
+        }
+    });
 
 </script>
 
